@@ -1,40 +1,44 @@
-var express = require('express');
-var app =express();
-var http =require('http').Server(app);
-var mongoose = require('mongoose');
-var bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser');
-var session = require('express-session');
-var mongoStore = require('connect-mongo')(session);
-var methodOverride = require('method-override');
-var path = require('path');
-var fs = require('fs');
-var logger = require('morgan');
+let express = require('express');
+let app =express();
+let http =require('http').Server(app);
+let mongoose = require('mongoose');
+let bodyParser = require('body-parser');
+let cookieParser = require('cookie-parser');
+let session = require('express-session');
+let mongoStore = require('connect-mongo')(session);
+let methodOverride = require('method-override');
+let path = require('path');
+let fs = require('fs');
+let logger = require('morgan');
 app.use(logger('dev'));
 
 //socket.io
 require('./library/Chat.js').sockets(http);
 
 //db connection
-mongoose.Promise = global.Promise;
-var dbPath = "mongodb://localhost/27017";
-mongoose.connect(dbPath,{ useMongoClient: true });
-mongoose.connection.once('open',function(){
-  console.log("Database Connected Successfully.");
-});
-var userModel = mongoose.model('user');
+
+const MongoURI = "mongodb://localhost:27017/adda"
+mongoose
+    .connect(MongoURI, {
+        useNewUrlParser: true
+    })
+    .then((res) => {
+        console.log(`MongoDB Connected`);
+    })
+
+let userModel = mongoose.model('user');
 
 //http method override middleware
 app.use(methodOverride(function(req,res){
   if(req.body && typeof req.body === 'object' && '_method' in req.body){
-    var method = req.body._method;
+    let method = req.body._method;
     delete req.body._method;
     return method;
   }
 }));
 
 // Session setup for cookies
-var sessionInit = session({
+let sessionInit = session({
                     name : 'userCookie',
                     secret : '9743-980-270-india',
                     resave : true,
@@ -65,7 +69,7 @@ fs.readdirSync("./app/models").forEach(function(file){
 //including controllers files.
 fs.readdirSync("./app/controllers").forEach(function(file){
   if(file.indexOf(".js")){
-    var route = require("./app/controllers/" + file);
+    let route = require("./app/controllers/" + file);
     route.controller(app);
   }
 });
