@@ -1,5 +1,6 @@
 body{
-  background-image: url("../images/chat1.jpg");
+  /* background-image: url("../images/1.jpg"); */
+  background-color: rgb(64, 11, 117);
   color: white;
   font-size: 16px;
   text-align: center;
@@ -14,7 +15,7 @@ body{
 } 
 .opaque-navbar {
     background-color: rgba(0,0,0,0);
-    height: 60px;
+    height: 10px;
     border-bottom: 0px;
     transition: background-color .1s ease 0s;
 }
@@ -50,7 +51,7 @@ hr {
   color:black;
 }
 .footer {
-    width: 100%;
+    /* width: 100%; */
     text-align: center;
     padding: 1%;
     margin-top: 1%;
@@ -92,7 +93,7 @@ p{
 
 #scrl1,
 #scrl2{
-  height: 400px;
+  height: 600px;
   overflow-y: auto;
 }
 .panel-success{
