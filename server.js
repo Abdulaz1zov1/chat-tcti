@@ -3,18 +3,19 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const passport = require("passport");
 const cors = require("cors");
-
 const users = require("./routes/api/users");
 const messages = require("./routes/api/messages");
-
+const dotenv = require('dotenv')
+dotenv.config()
 const app = express();
+const db = require('./db')
+db()
 
-// Port that the webserver listens to
-// const port = process.env.PORT;
 
-const server = app.listen(3000, () =>
-    console.log(`Server running on port 3000`)
-);
+
+
+
+const server = app.listen(process.env.PORT || 5000, console.log('run server 5000 port'))
 
 const io = require("socket.io").listen(server);
 
@@ -29,15 +30,6 @@ app.use(bodyParser.json());
 // CORS middleware
 app.use(cors());
 
-// Database configuration
-const db = require("./config/keys").mongoURI;
-
-mongoose
-    .connect(db, {
-        useNewUrlParser: true
-    })
-    .then(() => console.log("MongoDB Successfully Connected"))
-    .catch((err) => console.log(err));
 
 // Passport middleware
 app.use(passport.initialize());
@@ -53,3 +45,7 @@ app.use(function(req, res, next) {
 // Routes
 app.use("/api/users", users);
 app.use("/api/messages", messages);
+
+app.get('/', function(req, res) {
+    res.send('chat running');
+  });
