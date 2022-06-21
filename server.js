@@ -15,7 +15,7 @@ db()
 
 
 
-const server = app.listen(process.env.PORT || 5000, console.log('run server 5000 port'))
+const server = app.listen(process.env.PORT || 3000, console.log('run server 3000 port'))
 
 const io = require("socket.io").listen(server);
 
