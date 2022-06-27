@@ -26,14 +26,16 @@ router.use(function(req, res, next) {
 
 // Get global messages
 router.get('/global', (req, res) => {
-    GlobalMessage.aggregate([{
+    GlobalMessage.aggregate([
+        {
             $lookup: {
                 from: 'users',
                 localField: 'from',
                 foreignField: '_id',
                 as: 'fromObj',
             },
-        }, ])
+        },
+    ])
         .project({
             'fromObj.password': 0,
             'fromObj.__v': 0,
@@ -58,7 +60,6 @@ router.post('/global', (req, res) => {
         body: req.body.body,
     });
 
-
     req.io.sockets.emit('messages', req.body.body);
 
     message.save(err => {
@@ -77,14 +78,16 @@ router.post('/global', (req, res) => {
 // Get conversations list
 router.get('/conversations', (req, res) => {
     let from = mongoose.Types.ObjectId(jwtUser.id);
-    Conversation.aggregate([{
+    Conversation.aggregate([
+        {
             $lookup: {
                 from: 'users',
                 localField: 'recipients',
                 foreignField: '_id',
                 as: 'recipientObj',
             },
-        }, ])
+        },
+    ])
         .match({ recipients: { $all: [{ $elemMatch: { $eq: from } }] } })
         .project({
             'recipientObj.password': 0,
@@ -108,23 +111,24 @@ router.get('/conversations', (req, res) => {
 router.get('/conversations/query', (req, res) => {
     let user1 = mongoose.Types.ObjectId(jwtUser.id);
     let user2 = mongoose.Types.ObjectId(req.query.userId);
-    Message.aggregate([{
-                $lookup: {
-                    from: 'users',
-                    localField: 'to',
-                    foreignField: '_id',
-                    as: 'toObj',
-                },
+    Message.aggregate([
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'to',
+                foreignField: '_id',
+                as: 'toObj',
             },
-            {
-                $lookup: {
-                    from: 'users',
-                    localField: 'from',
-                    foreignField: '_id',
-                    as: 'fromObj',
-                },
+        },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'from',
+                foreignField: '_id',
+                as: 'fromObj',
             },
-        ])
+        },
+    ])
         .match({
             $or: [
                 { $and: [{ to: user1 }, { from: user2 }] },
@@ -156,18 +160,21 @@ router.post('/', (req, res) => {
     let from = mongoose.Types.ObjectId(jwtUser.id);
     let to = mongoose.Types.ObjectId(req.body.to);
 
-    Conversation.findOneAndUpdate({
+    Conversation.findOneAndUpdate(
+        {
             recipients: {
                 $all: [
                     { $elemMatch: { $eq: from } },
                     { $elemMatch: { $eq: to } },
                 ],
             },
-        }, {
+        },
+        {
             recipients: [jwtUser.id, req.body.to],
             lastMessage: req.body.body,
             date: Date.now(),
-        }, { upsert: true, new: true, setDefaultsOnInsert: true },
+        },
+        { upsert: true, new: true, setDefaultsOnInsert: true },
         function(err, conversation) {
             if (err) {
                 console.log(err);
